@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brain-twin"
+version = "0.1.0a1"
+description = "A local, source-grounded experience library with optional model answers"
+requires-python = ">=3.10"
+license = "MIT"
+readme = "README.md"
+dependencies = ["Flask>=3.1,<4"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.scripts]
+brain-twin = "brain_twin.app:main"
+
+[tool.setuptools.packages.find]
+include = ["brain_twin*"]
+
+[tool.setuptools.package-data]
+brain_twin = ["templates/*.html", "static/*.css", "static/*.js", "example.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "field-notes",
+  "name": "Field Notes · 工作札记",
+  "description": "A fictional experience library for a small remote team. 合成示例，可自由编辑。",
+  "instructions": "Be concise. Separate evidence from uncertainty. 简洁回答，区分资料和推断。",
+  "sources": [
+    {"id": "meeting-notes", "title": "Remote meetings · 远程会议", "text": "远程会议结束前留五分钟记录决定。每条决定写明负责人、截止时间和理由。未解决的问题放入待确认列表，不能写成已确认决定。\n\nReserve the final five minutes of a remote meeting to record decisions. Each decision needs an owner, a due date and its reason. Keep unresolved questions in a separate list; do not present them as confirmed decisions."},
+    {"id": "writing-habit", "title": "Writing clearly · 清晰写作", "text": "写作先列读者要做的动作。开头给结论，随后补充证据；复杂步骤用编号列表。发布前找一位不了解背景的人试读。\n\nStart writing with the action the reader needs to take. Lead with the conclusion and follow with evidence. Number complex steps. Ask someone unfamiliar with the context to read the draft before publishing."},
+    {"id": "experiment-log", "title": "Small experiments · 小实验", "text": "小实验开始前写下假设、成功条件和停止条件。每次只改变一个主要变量。结果不支持假设时保留原始观察，不把失败重新包装成成功。\n\nBefore a small experiment, write the hypothesis, success criteria and stopping rule. Change one major variable at a time. Preserve observations when the result contradicts the hypothesis."}
+  ]
+}

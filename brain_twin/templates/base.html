@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Brain Twin · Evidence before answers{% endblock %}</title>
+<script nonce="{{ nonce }}">try{document.documentElement.dataset.theme=localStorage.getItem('twin-theme')||'light';document.documentElement.lang=localStorage.getItem('twin-lang')||(navigator.language.startsWith('zh')?'zh':'en')}catch(e){}</script>
+<link rel="stylesheet" href="{{ asset('tokens.css') }}"><link rel="stylesheet" href="{{ asset('app.css') }}">
+{% block style %}{% endblock %}
+</head>
+<body>
+<a class="bt-skip" href="#main" data-i18n="skip">Skip to content</a>
+<header class="bt-topbar"><a href="/" class="bt-brand"><span class="bt-mark" aria-hidden="true">B.</span><span>Brain Twin <small>ALPHA</small></span></a><div class="bt-toolbar"><a href="/styleguide" class="bt-link" data-i18n="styleguide">Styleguide</a><button id="language" class="bt-btn ghost" type="button">中文</button><button id="theme" class="bt-btn ghost" type="button" data-i18n="theme">Dark theme</button></div></header>
+{% block content %}{% endblock %}
+<footer class="bt-footer"><span data-i18n="localFooter">Local first · Your sources remain yours</span><span>Brain Twin 0.1.0-alpha · MIT</span></footer>
+<script src="{{ asset('i18n.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body></html>
