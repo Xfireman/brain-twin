@@ -1,40 +1,79 @@
 # Brain Twin
 
-Turn a small set of notes into a source-grounded experience library. Ask a question, inspect the matching passages, and share only the material you choose.
+## Turn what you know into something people can ask.
 
-**Alpha · local, single-user · English / 中文 · MIT**
+You have written down how you run meetings, review drafts or make decisions. The useful advice is there—spread across notes people have to find and read.
 
-No model is required. The default mode returns **source excerpts**, clearly labeled as excerpts. A configured model can generate an answer from retrieved passages; every citation must reference a retrieved source and quote its text exactly. These checks do **not** prove that a generated claim is true.
+**Brain Twin turns selected text into a local experience library: ask a question, find the relevant passages and open the source behind them.** Connect a model to generate answers from those passages.
 
-[中文说明](README.zh-CN.md) · [Architecture and API](docs/architecture.md) · [Security](SECURITY.md) · [Design](DESIGN.md)
+[Try the example](#try-the-example) · [Download Alpha](https://github.com/Xfireman/brain-twin/releases/tag/v0.1.0-alpha.1) · [中文](README.zh-CN.md)
 
-![Brain Twin showing a source-backed excerpt](docs/screenshots/desktop-light.png)
+Local app · English / 中文 · MIT · Alpha
 
-## Run locally
+### Start with a question someone actually asks you
 
-Python 3.10 or later is required. From a downloaded source checkout:
+“What should we record before a meeting ends?”
+
+The included fictional **Field Notes** library contains this advice:
+
+> Reserve the final five minutes of a remote meeting to record decisions. Each decision needs an owner, a due date and its reason.
+
+Ask about recording decisions and Twin retrieves that passage. Open the source to read the rest, including what to do with unresolved questions. Ask about a subject the example does not cover to try the insufficient-sources response.
+
+No API key is needed to explore this source-excerpt workflow. With a configured model, Twin can compose an answer and attach references to retrieved passages. You can still inspect the original text; a matching citation alone does not prove the conclusion.
+
+![A question and matching source passages from the fictional Field Notes library](docs/screenshots/desktop-light.png)
+
+*The default mode displays source excerpts. The example and screenshot use fictional material.*
+
+### Build a library around experience worth reusing
+
+- **Your working methods:** notes on meetings, writing, experiments or project decisions.
+- **A guide people keep asking for:** collect the explanations you want them to be able to find again.
+- **A curated set of advice:** keep a focused library around one topic, with each source available for inspection.
+
+Paste the text you choose, give each source a title, and save. Ordinary forms let you edit the profile and source material. This Alpha accepts pasted text; document uploads, URL fetching and automatic account imports are outside this release.
+
+### Share a chosen part of your knowledge
+
+Choose the sources, preview their full contents, then download a profile package. Another user imports it into their local Twin and can ask their own questions or adapt the library.
+
+The package includes the full text of selected sources and profile settings. Questions, answers and configured credentials are excluded. Sharing is a file transfer, and the text you choose needs your privacy review.
+
+## Try the example
+
+Requires Python 3.10+ and Git. On macOS or Linux:
 
 ```sh
+git clone https://github.com/Xfireman/brain-twin.git
+cd brain-twin
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install .
 brain-twin
 ```
 
-On Windows, activate with `.venv\Scripts\activate` instead. Open **http://127.0.0.1:5043**. The command works from any directory after installation. Alternatively, run `python -m brain_twin.app`.
+Open **http://127.0.0.1:5043**, then:
 
-The fictional **Field Notes** profile is available on first launch. Click **Try: recording decisions**, then **Find evidence**. Open a citation to inspect the original text. Ask about Jupiter's moons to see an explicit “insufficient sources” response.
+1. In **Field Notes**, click **Try: recording decisions**, then **Find evidence**.
+2. Open the source to inspect the complete note.
+3. Ask “How many moons does Jupiter have?” to try an uncovered topic.
+4. Open **Shape the library**, add a short note of your own and save. Ask a question using words from that note.
 
-## Make it yours
+You have now tried both a useful match and a missing-source case. To generate an answer from the retrieved passages, [connect a model](#optional-model-answers).
 
-1. Open **Shape the library**. Edit the name, description, answer preferences and source texts using ordinary forms. Add or remove sources, then **Save library**.
-2. Open **Ask your sources**. Questions use the saved library; unsaved changes must be saved first.
-3. Open **Share a profile**. Select the sources, preview the exact package, and download the reviewed JSON. It contains profile metadata and the **full text** of selected sources. It excludes questions, answers and configured credentials. Secrets pasted into a source are still source text: review before sharing.
-4. Another person can select that JSON file, preview it and import it as a new profile. Existing profiles are not overwritten.
+On Windows, use `py -m venv .venv` and `.venv\Scripts\activate`. You can also [download the source archive](https://github.com/Xfireman/brain-twin/releases/tag/v0.1.0-alpha.1) and install from the extracted directory. After installation, `brain-twin` works from any directory; `--port 5053` changes the port.
 
-Source text is the only input format in this alpha. It does not fetch URLs, scan directories, ingest documents or access your accounts. The example contains synthetic material only.
+### Keep it focused
+
+Twin is most useful with **a small, deliberate collection of notes whose sources you want to inspect**. Local search matches words and Chinese character pairs, so paraphrases and synonyms can miss. Source selection and your own judgment still matter.
+
+For a repeatable method, see [Brain Recipes](https://github.com/Xfireman/brain-recipes). To continue an unfinished task in another conversation, see [Brain Relay](https://github.com/Xfireman/brain-relay).
 
 ## Optional model answers
+
+<details>
+<summary>Provider setup and the answer/citation contract</summary>
 
 Set the following **in the shell before starting**. `BRAIN_MODEL_URL` is the full chat-completions endpoint, not a base URL:
 
@@ -62,7 +101,12 @@ If evidence is insufficient, return `status: "insufficient"` with an empty `cita
 
 No real or paid model was used to test this alpha. Provider compatibility and answer quality remain your responsibility; the tests use an HTTP service on the loopback interface.
 
+</details>
+
 ## Storage and limits
+
+<details>
+<summary>Local files, data limits and deployment scope</summary>
 
 - Default data directory: `~/.local/share/brain-twin`. Override with `BRAIN_TWIN_DATA_DIR` before launch.
 - `profiles.json` is saved by atomic replacement with a single-process lock. Corrupt data causes a startup error instead of being replaced. Back up this file when the app is stopped.
@@ -74,13 +118,23 @@ No real or paid model was used to test this alpha. Provider compatibility and an
 
 `brain-twin --port 5053` changes the port. The server always binds to `127.0.0.1`. This is a personal local tool: do not expose the Flask development server to the Internet or use it for shared hosting.
 
+</details>
+
 ## Retrieval and truthfulness
+
+<details>
+<summary>How matching works and what citations do not prove</summary>
 
 Retrieval uses Chinese character bigrams and Latin word tokens with lexical overlap. It is offline and deterministic, but does not understand meaning or reliably match synonyms. Short or ambiguous questions can miss relevant material or match the wrong passage. Excerpts make no claim to answer the question. Model mode rejects unknown source IDs and quotes absent from retrieved excerpts, but a real quote can still be used misleadingly. Check the original text before relying on an answer. Source content is untrusted input; prompt injection resistance is not guaranteed.
 
 Changing the selected profile, editing sources or changing the question clears the previous answer. Starting another request also clears it, including when that request fails. Results are tied to the exact saved profile version, question and request; a late response cannot replace a newer answer, even if you switch away and back. If another tab saved different data, reload the page before asking again. Discarding a browser result does not cancel work already running on the server.
 
+</details>
+
 ## Development
+
+<details>
+<summary>Tests, browser checks and development setup</summary>
 
 ```sh
 python -m pip install '.[test]'
@@ -101,3 +155,5 @@ python scripts/browser_regressions.py
 ```
 
 The regression script covers answer invalidation, late-response races and session coexistence with another app on a different local port. Both browser scripts run in CI. `/styleguide` renders the actual components in both themes. [Screenshots](docs/screenshots) include desktop, mobile, source evidence and sharing. No front-end build step, CDN or external font is needed.
+
+</details>
