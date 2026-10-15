@@ -6,7 +6,7 @@ Brain Twin is a local single-user alpha. Bind it only to loopback; do not expose
 
 - Accepts text and JSON supplied by the user. It never fetches source URLs or loads paths embedded in imported data.
 - Restricts the browser Host to localhost and loopback IP addresses to reduce DNS rebinding exposure.
-- Requires a session CSRF token on JSON writes and rejects mismatched Origin and cross-site Fetch Metadata.
+- Requires a session CSRF token on JSON writes and rejects mismatched Origin and cross-site Fetch Metadata. Its `brain_twin_session` cookie is distinct from the default Flask session cookie used by neighboring local applications; browser cookies are not isolated by port.
 - Uses text nodes for user and model output, Jinja autoescaping, a nonce-based Content Security Policy, `nosniff`, strict same-site cookies and no external browser resources.
 - Reads model configuration at startup. A request cannot choose the upstream URL. Remote providers require HTTPS; HTTP is limited to loopback addresses. URL userinfo, query strings and fragments are rejected. Redirects are refused so credentials are not forwarded to another address.
 - Keeps model keys server-side. It never stores or exports them and never shows provider error response bodies. Do not configure verbose HTTP/proxy logging that could record credentials.

@@ -28,7 +28,7 @@ Static panels use `shadow-1`; the source dialog uses `shadow-3`. Dark themes sep
 
 ## 7. Interaction
 
-Only real buttons and links are interactive. Keyboard focus remains visible. Deleting a profile or source asks for confirmation with the consequence. Saving reports success only after the API succeeds. A query shows actual queued/running states and prevents repeat submission. Data remains plain text even when it contains HTML. Export is explicit: select, preview full contents, download.
+Only real buttons and links are interactive. Keyboard focus remains visible. Deleting a profile or source asks for confirmation with the consequence. Saving reports success only after the API succeeds. A query shows actual queued/running states and prevents repeat submission of that request. Changing the profile, sources or question invalidates the old answer; a new request and its failure never leave an earlier answer under the new context. Rendering requires matching request identity, question and saved profile version. Data remains plain text even when it contains HTML. Export is explicit: select, preview full contents, download.
 
 ## 8. Accessibility and verification
 

@@ -78,7 +78,7 @@ No real or paid model was used to test this alpha. Provider compatibility and an
 
 Retrieval uses Chinese character bigrams and Latin word tokens with lexical overlap. It is offline and deterministic, but does not understand meaning or reliably match synonyms. Short or ambiguous questions can miss relevant material or match the wrong passage. Excerpts make no claim to answer the question. Model mode rejects unknown source IDs and quotes absent from retrieved excerpts, but a real quote can still be used misleadingly. Check the original text before relying on an answer. Source content is untrusted input; prompt injection resistance is not guaranteed.
 
-If a profile changes during a running answer, that answer fails and asks you to retry. A previously displayed answer is a historical result; opening its source checks whether the stored text has since changed.
+Changing the selected profile, editing sources or changing the question clears the previous answer. Starting another request also clears it, including when that request fails. Results are tied to the exact saved profile version, question and request; a late response cannot replace a newer answer, even if you switch away and back. If another tab saved different data, reload the page before asking again. Discarding a browser result does not cancel work already running on the server.
 
 ## Development
 
@@ -97,6 +97,7 @@ For the real browser flow (Chromium):
 python -m pip install playwright
 python -m playwright install chromium
 python scripts/browser_smoke.py
+python scripts/browser_regressions.py
 ```
 
-`/styleguide` renders the actual components in both themes. [Screenshots](docs/screenshots) include desktop, mobile, source evidence and sharing. No front-end build step, CDN or external font is needed.
+The regression script covers answer invalidation, late-response races and session coexistence with another app on a different local port. Both browser scripts run in CI. `/styleguide` renders the actual components in both themes. [Screenshots](docs/screenshots) include desktop, mobile, source evidence and sharing. No front-end build step, CDN or external font is needed.

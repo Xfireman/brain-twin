@@ -12,13 +12,13 @@ from .storage import Store
 from .model_client import ModelClient
 from .jobs import Jobs
 from .retrieval import retrieve
-from .twin import export_profile, new_id, text, validate_answer, validate_profile
+from .twin import export_profile, new_id, profile_version, text, validate_answer, validate_profile
 
 
 def create_app(config=None):
     app=Flask(__name__)
     app.config.update(SECRET_KEY=secrets.token_hex(32),MAX_CONTENT_LENGTH=2*1024*1024,
-        SESSION_COOKIE_HTTPONLY=True,SESSION_COOKIE_SAMESITE='Strict',
+        SESSION_COOKIE_NAME='brain_twin_session',SESSION_COOKIE_HTTPONLY=True,SESSION_COOKIE_SAMESITE='Strict',
         TRUSTED_HOSTS=['localhost','127.0.0.1','[::1]'],
         DATA_DIR=os.environ.get('BRAIN_TWIN_DATA_DIR',str(Path.home()/'.local/share/brain-twin')),
         MODEL_ENDPOINT=os.environ.get('BRAIN_MODEL_URL',''),MODEL_NAME=os.environ.get('BRAIN_MODEL_NAME',''),MODEL_KEY=os.environ.get('BRAIN_MODEL_KEY',''))
@@ -131,13 +131,19 @@ def create_app(config=None):
     @app.post('/api/ask')
     def ask():
         data=request.get_json()
-        if not isinstance(data,dict) or set(data)-{'profile_id','question','lang'}:
-            raise ValueError('question: expected profile_id, question and optional lang')
+        if not isinstance(data,dict) or set(data)-{'profile_id','question','lang','profile_version'}:
+            raise ValueError('question: expected profile_id, question and optional lang/profile_version')
         question=text(data.get('question'),'question',4000,True)
         lang=data.get('lang','en')
         if lang not in ('zh','en'):
             raise ValueError('lang: expected zh or en')
         profile=store.get(data.get('profile_id'))
+        version=profile_version(profile)
+        expected_version=data.get('profile_version')
+        if expected_version is not None:
+            text(expected_version,'profile_version',64,True)
+            if expected_version!=version:
+                return jsonify(error='The saved library changed; reload this page before asking again'),409
         def answer():
             hits=retrieve(question,profile['sources'])
             mode='configured_provider' if model.configured else 'extracts'
@@ -154,7 +160,7 @@ def create_app(config=None):
                 unchanged=False
             if not unchanged:
                 raise ValueError('Sources changed while this task ran; ask again using the saved profile')
-            return {**result,'mode':mode,'sources':[{'id':h['id'],'title':h['title'],'excerpt':h['excerpt']} for h in hits],
+            return {**result,'mode':mode,'profile_version':version,'sources':[{'id':h['id'],'title':h['title'],'excerpt':h['excerpt']} for h in hits],
                     'notice':'Citation checks verify IDs and exact quotes, not the truth of the generated claims.'}
         try:
             task_id=jobs.submit(answer)

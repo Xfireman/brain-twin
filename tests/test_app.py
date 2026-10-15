@@ -108,3 +108,26 @@ def test_shared_package_works_in_another_users_empty_data_directory(client,tmp_p
     question=other.post('/api/ask',json={'profile_id':imported.json['id'],'question':'海龟调查几点开始？','lang':'zh'},headers=other_headers)
     result=wait_job(other,question.json['task_id'])['result']
     assert result['citations']==[{'source_id':'turtles','quote':'海龟调查每天清晨六点开始。'}]
+
+
+def test_neighbor_default_session_cookie_does_not_replace_twin_session(client):
+    data,headers=bootstrap(client)
+    profile=data['profiles'][0]
+    client.set_cookie('session','synthetic-neighbor-cookie')
+    response=client.put('/api/profiles/'+profile['id'],json=profile,headers=headers)
+    assert response.status_code==200
+
+
+def test_question_binds_to_exact_saved_profile_version(client):
+    import hashlib
+    data,headers=bootstrap(client)
+    profile=data['profiles'][0]
+    version=hashlib.sha256(json.dumps(profile,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+    response=client.post('/api/ask',json={'profile_id':profile['id'],'question':'远程会议记录决定','profile_version':version},headers=headers)
+    assert response.status_code==202
+    result=wait_job(client,response.json['task_id'])['result']
+    assert result['profile_version']==version
+    profile['sources'][0]['text']='Remote meeting decisions have changed.'
+    client.put('/api/profiles/'+profile['id'],json=profile,headers=headers)
+    stale=client.post('/api/ask',json={'profile_id':profile['id'],'question':'远程会议记录决定','profile_version':version},headers=headers)
+    assert stale.status_code==409

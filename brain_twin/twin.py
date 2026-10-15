@@ -1,6 +1,8 @@
 """Validated profile and answer contracts. Export is an explicit field allowlist."""
 import re
 import uuid
+import hashlib
+import json
 
 
 def text(value, field, maximum, required=False):
@@ -47,6 +49,11 @@ def validate_profile(data):
 
 def new_id():
     return uuid.uuid4().hex
+
+
+def profile_version(profile):
+    canonical=json.dumps(profile,sort_keys=True,ensure_ascii=False,separators=(',',':'))
+    return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
 
 
 def export_profile(profile, source_ids):
